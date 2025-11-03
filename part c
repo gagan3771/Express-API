@@ -1,0 +1,85 @@
+// server-and-client.js
+// ───────────────────────
+// Backend (Node.js + Express + Socket.IO)
+const express = require("express");
+const http = require("http");
+const { Server } = require("socket.io");
+const cors = require("cors");
+
+const app = express();
+app.use(cors());
+const server = http.createServer(app);
+const io = new Server(server, { cors: { origin: "http://localhost:3000" } });
+
+io.on("connection", socket => {
+  console.log("User connected:", socket.id);
+  socket.on("send_message", data => {
+    io.emit("receive_message", data);
+  });
+  socket.on("disconnect", () => {
+    console.log("User disconnected:", socket.id);
+  });
+});
+
+const BACKEND_PORT = 4000;
+server.listen(BACKEND_PORT, () => console.log(`Server running on http://localhost:${BACKEND_PORT}`));
+
+// ───────────────────────
+// Frontend (React) — e.g. replace `src/App.js`
+/*
+import React, { useState, useEffect } from "react";
+import io from "socket.io-client";
+const socket = io("http://localhost:4000");
+
+function App() {
+  const [name, setName] = useState("");
+  const [message, setMessage] = useState("");
+  const [messages, setMessages] = useState([]);
+
+  useEffect(() => {
+    socket.on("receive_message", data => {
+      setMessages(prev => [...prev, data]);
+    });
+    return () => socket.off("receive_message");
+  }, []);
+
+  const sendMessage = () => {
+    if (name.trim() && message.trim()) {
+      const msg = { name, message };
+      socket.emit("send_message", msg);
+      setMessage("");
+    }
+  };
+
+  return (
+    <div style={{ margin: "20px" }}>
+      <h2>Real-Time Chat</h2>
+      <input
+        type="text"
+        placeholder="Your name"
+        value={name}
+        onChange={e => setName(e.target.value)}
+        style={{ marginRight: 10 }}
+      />
+      <br /><br />
+      <input
+        type="text"
+        placeholder="Type a message"
+        value={message}
+        onChange={e => setMessage(e.target.value)}
+      />
+      <button onClick={sendMessage} style={{ marginLeft: 10 }}>Send</button>
+      <div style={{ marginTop: 20 }}>
+        <h3>Messages:</h3>
+        <ul>
+          {messages.map((m, idx) => (
+            <li key={idx}><strong>{m.name}:</strong> {m.message}</li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+}
+
+export default App;
+*/
