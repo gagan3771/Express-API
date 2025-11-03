@@ -1,0 +1,82 @@
+// server-and-client.js
+// This file shows both backend (Express) and frontend (React) parts
+// For real use you’d split into separate folders; here it’s combined for simplicity.
+
+///////////////////////
+// Backend (Express) //
+///////////////////////
+const express = require('express');
+const cors = require('cors');
+const app = express();
+
+app.use(cors());                // Allow CORS for frontend
+app.use(express.json());        // Parse JSON bodies
+
+// Sample products data
+const products = [
+  { id: 1, name: 'Product A', price: 100 },
+  { id: 2, name: 'Product B', price: 200 },
+  { id: 3, name: 'Product C', price: 300 }
+];
+
+// API route to get products
+app.get('/api/products', (req, res) => {
+  res.json(products);
+});
+
+const BACKEND_PORT = 5000;
+app.listen(BACKEND_PORT, () => {
+  console.log(`Backend running at http://localhost:${BACKEND_PORT}`);
+});
+
+//////////////////////
+// Frontend (React) //
+//////////////////////
+
+/*
+Assuming you have created a React app, replace src/App.js content with this:
+
+// src/App.js
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+
+function App() {
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading]   = useState(true);
+  const [error, setError]       = useState(null);
+
+  useEffect(() => {
+    async function fetchProducts() {
+      try {
+        const response = await axios.get('http://localhost:5000/api/products');
+        setProducts(response.data);
+      } catch (err) {
+        setError('Failed to fetch products');
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchProducts();
+  }, []);
+
+  if (loading) return <div>Loading products…</div>;
+  if (error)   return <div>{error}</div>;
+
+  return (
+    <div>
+      <h1>Product Catalog</h1>
+      <ul>
+        {products.map(p => (
+          <li key={p.id}>
+            {p.name} — ₹{p.price}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+export default App;
+*/
+
+ 
